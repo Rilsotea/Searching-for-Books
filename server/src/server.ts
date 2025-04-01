@@ -1,11 +1,14 @@
 import express from 'express';
 import path from 'node:path';
 import type { Request, Response } from 'express';
-import db from './config/connection.js'
 import { ApolloServer } from '@apollo/server';
+import mongoose from 'mongoose';
 import { expressMiddleware } from '@apollo/server/express4';
 import { typeDefs, resolvers } from './schemas/index.js';
 import { authenticateToken } from './services/auth.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const server = new ApolloServer({
   typeDefs,
@@ -14,7 +17,8 @@ const server = new ApolloServer({
 
 const startApolloServer = async () => {
   await server.start();
-  await db();
+
+  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/googlebooks');
 
   const PORT = process.env.PORT || 3001;
   const app = express();
@@ -22,19 +26,23 @@ const startApolloServer = async () => {
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
-  app.use('/graphql', expressMiddleware(server as any,
-    {
-      context: authenticateToken as any
-    }
-  ));
+  app.use('/graphql', expressMiddleware(server, {
+    context: authenticateToken
+  }));
 
   if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../client/dist')));
+    app.use(express.static(path.resolve('../client/dist')));
 
     app.get('*', (_req: Request, res: Response) => {
-      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+      res.sendFile(path.resolve('../client/dist/index.html'));
     });
   }
+
+  // Error handling middleware
+  app.use((err: Error, _: Request, res: Response) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+  });
 
   app.listen(PORT, () => {
     console.log(`API server running on port ${PORT}!`);
@@ -43,24 +51,3 @@ const startApolloServer = async () => {
 };
 
 startApolloServer();
-
-// import express from 'express';
-// import db from './config/connection.js';
-// import routes from './routes/index.js';
-
-// const app = express();
-// const PORT = process.env.PORT || 3001;
-
-// app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());
-
-// if we're in production, serve client/build as static assets
-// if (process.env.NODE_ENV === 'production') {
-//   app.use(express.static('../client/build'));
-// }
-
-// app.use(routes);
-
-// db.once('open', () => {
-//   app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));
-// });
