@@ -50,10 +50,10 @@ const resolvers: IResolvers = {
         addUser: async ({ input }: AddUserArgs) => {
             try {
                 const user = await User.create(input);
-                const token = signToken(user.username, user._id); // Avoid including the password
+                const token = signToken(user.username, user.email, user._id);
                 return { token, user };
             } catch (error) {
-                throw new Error('Error creating user: ');
+                throw new Error('Error creating user: ')
             }
         },
         login: async ({ email, password }: LoginArgs): Promise<any> => {
@@ -66,10 +66,10 @@ const resolvers: IResolvers = {
                 if (!isCorrectPassword) {
                     throw new Error('Incorrect password');
                 }
-                const token = signToken(user.username, user._id); // Avoid including the password
+                const token = signToken(user.username, user.email, user._id);
                 return { token, user };
             } catch (error) {
-                throw new Error('Error logging in: ');
+                throw new Error('Error logging in: ')
             }
         },
         saveBook: async (args: SaveBook, context: any) => {
@@ -81,7 +81,7 @@ const resolvers: IResolvers = {
                 const book = await Book.create({ bookId, authors, description, title, image, link });
                 return book;
             } catch (error) {
-                throw new Error('Error saving book: ');
+                throw new Error('Error saving book: ')
             }
         },
         removeBook: async ({ bookId }: RemoveBookArgs, context: any) => {
