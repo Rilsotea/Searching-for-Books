@@ -1,5 +1,5 @@
 const typeDefs = `
-  type Ussr {
+  type User {
     id: ID!
     username: String!
     email: String!
@@ -29,6 +29,12 @@ const typeDefs = `
     login(email: String!, password: String!): AuthPayload
     saveBook(bookId: ID!, authors: [String], description: String, title: String, image: String, link: String): Book
     removeBook(bookId: ID!): Book
+  }
+  
+  input AddUserInput {
+    username: String!
+    email: String!
+    password: String!
   }
 `;
 

@@ -10,12 +10,33 @@ import { Outlet } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
 
+const httpLink = createHttpLink({
+  uri: 'http://localhost:3001/graphql',
+});
+
+// Set up the authentication context (if needed)
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('token');
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : '',
+    }
+  };
+});
+
+
+const client = new ApolloClient({
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache(),
+});
+
 function App() {
   return (
     <ApolloProvider client={client}>
       <Navbar />
       <Outlet />
-    </ApolloProvider >
+    </ApolloProvider>
   );
 }
 
