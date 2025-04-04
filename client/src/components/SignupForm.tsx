@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
+import { useMutation } from '@apollo/client';
+import { ADD_USER } from '../utils/mutations';
 import Auth from '../utils/auth';
 import type { User } from '../models/User';
-import { ADD_USER } from '../utils/mutations';
-import { useMutation } from '@apollo/client';
-
 
 // biome-ignore lint/correctness/noEmptyPattern: <explanation>
 const SignupForm = ({}: { handleModalClose: () => void }) => {
@@ -34,28 +33,20 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
 
     try {
       const { data } = await addUser({
-        variables: { input: userFormData },
+        variables: { input: userFormData }, // Pass userFormData as input
       });
-      // const response = await addUser(userFormData);
 
-      // if (!response.ok) {
-      //   throw new Error('something went wrong!');
-      // }
-      
-      
-      const { token } = data.addUser; // Access the token from the response
+      // Check if the response contains a token
+      if (!data.addUser.token) {
+        throw new Error('something went wrong!');
+      }
+
+      const { token } = data.addUser;
       Auth.login(token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
     }
-
-    //   const { token } = await response.json();
-    //   Auth.login(token);
-    // } catch (err) {
-    //   console.error(err);
-    //   setShowAlert(true);
-    // }
 
     setUserFormData({
       username: '',
