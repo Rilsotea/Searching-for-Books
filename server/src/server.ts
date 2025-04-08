@@ -1,5 +1,4 @@
 import express from 'express';
-import path from 'node:path';
 import type { Request, Response } from 'express';
 import { ApolloServer } from '@apollo/server';
 import mongoose from 'mongoose';
@@ -31,19 +30,15 @@ const startApolloServer = async () => {
   }));
 
   if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../client/dist')));
+    app.use(express.static('../client/dist'));
 
     app.get('*', (_req: Request, res: Response) => {
-      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+      res.sendFile('../client/dist/index.html');
     });
   }
 
   // Error handling middleware
-  app.use((err: Error, _: Request, res: Response) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
-  });
-
+  
   app.listen(PORT, () => {
     console.log(`API server running on port ${PORT}!`);
     console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);

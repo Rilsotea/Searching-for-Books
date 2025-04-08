@@ -1,5 +1,5 @@
-import { User, Book } from '../models/index';
-import { signToken, authenticateToken } from '../services/auth';
+import { User, Book } from '../models/index.js';
+import { signToken, authenticateToken } from '../services/auth.js';
 
 interface AddUserArgs {
     input: {

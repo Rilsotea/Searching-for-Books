@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 
 export interface BookDocument extends Document {
   bookId: string;
@@ -10,7 +10,7 @@ export interface BookDocument extends Document {
 }
 
 // This is a subdocument schema, it won't become its own model but we'll use it as the schema for the User's `savedBooks` array in User.js
-const bookSchema = new Schema<BookDocument>({
+export const bookSchema = new Schema<BookDocument>({
   authors: [
     {
       type: String,
@@ -37,5 +37,5 @@ const bookSchema = new Schema<BookDocument>({
   },
 });
 
-const Book: Model<BookDocument> = mongoose.model<BookDocument>('Book', bookSchema);
+const Book = model<BookDocument>('Book', bookSchema);
 export default Book;

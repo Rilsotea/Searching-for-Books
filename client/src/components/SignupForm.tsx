@@ -33,7 +33,11 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
 
     try {
       const { data } = await addUser({
-        variables: { input: userFormData }, // Pass userFormData as input
+        variables: { input: {
+          username: userFormData.username,
+          email: userFormData.email,
+          password: userFormData.password,
+        } }, // Pass userFormData as input
       });
 
       // Check if the response contains a token
