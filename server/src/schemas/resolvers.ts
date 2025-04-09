@@ -1,5 +1,6 @@
 import { User, Book } from '../models/index.js';
 import { signToken, authenticateToken } from '../services/auth.js';
+import { IResolvers } from '@graphql-tools/utils';
 
 interface AddUserArgs {
     input: {
@@ -8,6 +9,20 @@ interface AddUserArgs {
         password: string;
     }
 }
+
+interface User {
+    username: String
+    email: String
+    savedBooks: [Book]
+  }
+
+  interface Book {
+    authors: [String]
+    description: String
+    title: String
+    image: String
+    link: String
+  }
 
 interface LoginArgs {
     email: string;
@@ -36,7 +51,6 @@ interface RemoveBookArgs {
 //     link: string;
 // }
 
-import { IResolvers } from '@graphql-tools/utils';
 
 const resolvers: IResolvers = {
     Query: {
@@ -47,13 +61,13 @@ const resolvers: IResolvers = {
     },
 
     Mutation: {
-        addUser: async ({ input }: AddUserArgs) => {
+        addUser: async ({ input }: AddUserArgs)=> {
             try {
                 const user = await User.create(input);
                 const token = signToken(user.username, user.email, user._id);
                 return { token, user };
             } catch (error) {
-                throw new Error('Error creating user: ')
+                throw new Error('Error creating user: ');
             }
         },
         login: async ({ email, password }: LoginArgs): Promise<any> => {
