@@ -46,7 +46,7 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
           password: userFormData.password,
         } }, // Pass userFormData as input
       });
-
+      console.log('Mutation Response:', data);
       // Check if the response contains a token
       if (!data.addUser.token) {
         throw new Error('something went wrong!');

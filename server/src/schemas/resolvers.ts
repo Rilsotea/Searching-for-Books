@@ -61,13 +61,13 @@ const resolvers: IResolvers = {
     },
 
     Mutation: {
-        addUser: async ({ input }: AddUserArgs)=> {
+        addUser: async (_, { input }: AddUserArgs) => {
             try {
-                const user = await User.create(input);
-                const token = signToken(user.username, user.email, user._id);
-                return { token, user };
+              const user = await User.create(input);
+              const token = signToken(user.username, user.email, user._id);
+              return { token, user };
             } catch (error) {
-                throw new Error('Error creating user: ');
+              throw new Error('Error creating user: ');
             }
         },
         login: async ({ email, password }: LoginArgs): Promise<any> => {
@@ -87,15 +87,21 @@ const resolvers: IResolvers = {
             }
         },
         saveBook: async (args: SaveBook, context: any) => {
+            // Check if the user is authenticated
             if (!context.user) {
                 throw new Error('You need to be logged in to save a book');
             }
+        
             const { bookId, authors, description, title, image, link } = args;
+        
             try {
-                const book = await Book.create({ bookId, authors, description, title, image, link });
-                return book;
+                // Create a new book entry in the database
+                const book = await Book.create({ bookId, authors, description, title, image, link });   
+
+                return book; // Return the saved book
             } catch (error) {
-                throw new Error('Error saving book: ')
+                console.error('Error saving book:');
+                throw new Error('Error saving book: ');
             }
         },
         removeBook: async ({ bookId }: RemoveBookArgs, context: any) => {
